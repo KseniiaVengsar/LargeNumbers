@@ -1,47 +1,47 @@
 // LargeNumbers.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//��� ����� ����������� ����� ��� ������ � �������� �������, ������� �� ���������� � ����������� ���� ������.
+//Âàì íóæíî ðåàëèçîâàòü êëàññ äëÿ ðàáîòû ñ áîëüøèìè ÷èñëàìè, êîòîðûå íå ïîìåùàþòñÿ â ñòàíäàðòíûå òèïû äàííûõ.
 
 #include <iostream>
 #include <vector>
+#include <algorithm>  
 
 class big_integer {
 private:
     std::vector<int> digits;
 
 public:
-   
-    big_integer(std::string&& str) {
+    //Конструктор с константной ссылкой
+    big_integer(const std::string& str) {
         for (char ch : str) {
             digits.push_back(ch - '0');
         }
         std::reverse(digits.begin(), digits.end());
     }
-
-   
+//Конструктор копирования
     big_integer(const big_integer& other) : digits(other.digits) {}
+//Конструктор перемещения
+    big_integer(big_integer&& other) noexcept : digits(std::move(other.digits)) {}
 
-    
-    big_integer& operator=(big_integer&& other) {
+  //Оператор перемещающего присваивания
+    big_integer& operator=(big_integer&& other) noexcept {
         if (this != &other) {
             digits = std::move(other.digits);
         }
         return *this;
     }
-
-    
+// Оператор сложения
     big_integer operator+(const big_integer& other) const {
         big_integer result = *this;
         result += other;
         return result;
     }
-
-    
+// Оператор умножения на целое число
     big_integer operator*(int num) const {
         big_integer result = *this;
         result *= num;
         return result;
     }
-
+    // Оператор сложения с присваиванием
     big_integer& operator+=(const big_integer& other) {
         int carry = 0;
         for (size_t i = 0; i < std::max(digits.size(), other.digits.size()) || carry; ++i) {
@@ -54,8 +54,7 @@ public:
         }
         return *this;
     }
-
-  
+// Оператор умножения на целое число с присваиванием
     big_integer& operator*=(int num) {
         int carry = 0;
         for (size_t i = 0; i < digits.size() || carry; ++i) {
@@ -68,8 +67,7 @@ public:
         }
         return *this;
     }
-
-   
+    //Перегрузка оператора вывода
     friend std::ostream& operator<<(std::ostream& os, const big_integer& bigint) {
         for (auto it = bigint.digits.rbegin(); it != bigint.digits.rend(); ++it) {
             os << *it;
@@ -79,6 +77,9 @@ public:
 };
 
 int main() {
+
+    std::setlocale(LC_ALL, "RU");
+
     auto number1 = big_integer("114575");
     auto number2 = big_integer("78524");
     auto result = number1 + number2;
